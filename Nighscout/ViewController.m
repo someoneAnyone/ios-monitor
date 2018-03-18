@@ -36,7 +36,7 @@
     [self setNeedsStatusBarAppearanceUpdate];
     [self refreshNightscout];
     
-
+    
 }
 
 -(UIStatusBarStyle)preferredStatusBarStyle{
@@ -52,20 +52,57 @@
 }
 
 - (void)requestUrl:(NSString *)message {
-    UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"Hello!" message:message delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Continue",nil];
-    alert.alertViewStyle = UIAlertViewStylePlainTextInput;
-    UITextField * alertTextField = [alert textFieldAtIndex:0];
-    alertTextField.keyboardType = UIKeyboardTypeAlphabet;
+ 
+    UIAlertController * alert = [UIAlertController alertControllerWithTitle:@"Hello" message:message preferredStyle: UIAlertControllerStyleAlert];
     
-    //TODO: boolean return method as this is being reused
-    if (self.lastUrl==nil || [self.lastUrl  isEqual:self.defaultUrl]){
-        alertTextField.placeholder = @"http://your.nightscout.site";
-    } else
-    {
-        alertTextField.text = self.lastUrl;
-    }
+    [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+        textField.keyboardType = UIKeyboardTypeAlphabet;
+        
+        if (self.lastUrl==nil || [self.lastUrl  isEqual:self.defaultUrl]){
+            textField.placeholder = @"http://your.nightscout.site";
+        } else
+        {
+            textField.text = self.lastUrl;
+        }
+    }];
     
-    [alert show];
+    UIAlertAction * cancel = [UIAlertAction actionWithTitle:@"Cancel" style: UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+        NSURL *url = [NSURL URLWithString:self.nightscoutUrl];
+        if (url && url.scheme && url.host) {
+            [self loadUrl];
+        } else {
+            NSURL *url = [NSURL URLWithString:self.defaultUrl ];
+            if (url && url.scheme && url.host) {
+                NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
+                [self.nightscoutSite loadRequest:requestObj];
+            }
+        }
+    }];
+    
+    UIAlertAction * continueAction = [UIAlertAction actionWithTitle:@"Continue" style: UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        
+        UITextField *textField = alert.textFields.firstObject;
+        
+        NSLog(@"Entered: %@",[textField text]);
+        self.nightscoutUrl = [textField text];//[[alertView textFieldAtIndex:0] text];
+        if ([self.nightscoutUrl hasPrefix:@"http://"] || [self.nightscoutUrl hasPrefix:@"https://"] )
+        {
+            //good to go
+        }
+        else {
+            self.nightscoutUrl = [NSString stringWithFormat:@"http://%@", self.nightscoutUrl];
+        }
+        [[SettingsManager sharedManager] setLastURL:self.nightscoutUrl];
+        self.lastUrl = self.nightscoutUrl;
+        [self.setUrl setTitle:@"Change URL" forState: UIControlStateNormal];
+        [self loadUrl];
+        
+    }];
+    
+    [alert addAction:cancel];
+    [alert addAction:continueAction];
+   
+    [self presentViewController:alert animated:true completion:nil];
 }
 
 - (void)loadUrl {
@@ -82,35 +119,6 @@
     }
 }
 
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
-    if (buttonIndex==1){
-        NSLog(@"Entered: %@",[[alertView textFieldAtIndex:0] text]);
-        self.nightscoutUrl =[[alertView textFieldAtIndex:0] text];
-        if ([self.nightscoutUrl hasPrefix:@"http://"] || [self.nightscoutUrl hasPrefix:@"https://"] )
-        {
-            //good to go
-        }
-        else {
-            self.nightscoutUrl = [NSString stringWithFormat:@"http://%@", self.nightscoutUrl];
-        }
-        [[SettingsManager sharedManager] setLastURL:self.nightscoutUrl];
-        self.lastUrl = self.nightscoutUrl;
-        [self.setUrl setTitle:@"Change URL" forState: UIControlStateNormal];
-        [self loadUrl];
-    } else {
-        NSURL *url = [NSURL URLWithString:self.nightscoutUrl];
-        if (url && url.scheme && url.host) {
-            [self loadUrl];
-        } else {
-            NSURL *url = [NSURL URLWithString:self.defaultUrl ];
-            if (url && url.scheme && url.host) {
-                NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
-                [self.nightscoutSite loadRequest:requestObj];
-            }
-        }
-    }
-}
-
 - (IBAction)updateUrl:(id)sender {
     [self requestUrl:@"Please enter your Nightscout URL"];
 }
@@ -119,7 +127,7 @@
     [self loadUrl];
 }
 
-- (void) refreshNightscout {
+- (void)refreshNightscout {
     self.nightscoutSite.delegate = self;
     self.nightscoutSite.backgroundColor = [UIColor clearColor];
     self.nightscoutSite.alpha = 0.0;
@@ -143,9 +151,8 @@
     } else {
         [self.sleep setTitle: @"Sleep On" forState: UIControlStateNormal];
     }
-
+    
 }
-
 
 - (IBAction)changeSleep:(id)sender {
     [[SettingsManager sharedManager] setScreenLock:[sender isOn]];
@@ -157,14 +164,13 @@
     return YES;
 }
 
-- (void)webViewDidStartLoad:(UIWebView *)webView{
+- (void)webViewDidStartLoad:(UIWebView *)webView {
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 }
 
-- (void)webViewDidFinishLoad:(UIWebView *)webView
-{
-        
+- (void)webViewDidFinishLoad:(UIWebView *)webView {
+    
     [self fadeIn : webView withDuration: 3 andWait : 1 ];
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
@@ -184,8 +190,7 @@
 }
 
 #pragma mark ANIMATION
--(void)fadeIn:(UIView*)viewToFadeIn withDuration:(NSTimeInterval)duration 	  andWait:(NSTimeInterval)wait
-{
+-(void)fadeIn:(UIView*)viewToFadeIn withDuration:(NSTimeInterval)duration 	  andWait:(NSTimeInterval)wait {
     self.nightscoutSite.backgroundColor = [UIColor blackColor];
     self.nightscoutSite.opaque = YES;
     [UIView beginAnimations: @"Fade In" context:nil];
@@ -197,7 +202,7 @@
     [UIView setAnimationDuration:duration];
     viewToFadeIn.alpha = 1;
     [UIView commitAnimations];
-
+    
 }
 
 - (void)toggleScreenLockOverride:(BOOL)on {
