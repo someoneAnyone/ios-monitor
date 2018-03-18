@@ -22,12 +22,13 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <webView contentMode="scaleToFill" scalesPageToFit="YES" translatesAutoresizingMaskIntoConstraints="NO" id="94s-lY-C7V">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="693"/>
-                                <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                            <webView contentMode="scaleAspectFit" scalesPageToFit="YES" translatesAutoresizingMaskIntoConstraints="NO" id="94s-lY-C7V">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="685"/>
+                                <color key="backgroundColor" red="0.36078431372549019" green="0.38823529411764707" blue="0.40392156862745099" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <dataDetectorType key="dataDetectorTypes"/>
                             </webView>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="Pjv-Mb-XJh">
-                                <rect key="frame" x="16" y="693" width="343" height="85"/>
+                                <rect key="frame" x="16" y="685" width="343" height="85"/>
                                 <subviews>
                                     <view tag="-1" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="N4G-8w-SV7" userLabel="Volume View" customClass="MPVolumeView">
                                         <rect key="frame" x="0.0" y="0.0" width="343" height="50"/>
@@ -108,7 +109,7 @@ Override</string>
                             <constraint firstItem="4JX-p1-7QB" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="2Sp-Rd-TPy"/>
                             <constraint firstItem="Pda-Oa-pu9" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Cld-45-5Zb"/>
                             <constraint firstAttribute="trailing" secondItem="4JX-p1-7QB" secondAttribute="trailing" id="E1f-tg-GlR"/>
-                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="Pjv-Mb-XJh" secondAttribute="bottom" id="Ek8-kd-Hlb"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="Pjv-Mb-XJh" secondAttribute="bottom" constant="8" id="Ek8-kd-Hlb"/>
                             <constraint firstItem="4JX-p1-7QB" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="NR6-eY-iZF"/>
                             <constraint firstItem="94s-lY-C7V" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="OE9-ob-gaj"/>
                             <constraint firstAttribute="bottom" secondItem="4JX-p1-7QB" secondAttribute="bottom" id="QWY-m0-OAO"/>
